@@ -45,22 +45,20 @@ CSRF_USE_SESSIONS = True
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Default session engine
 
-SESSION_COOKIE_HTTPONLY = True  # To prevent JavaScript access to the session cookie
+SESSION_COOKIE_HTTPONLY = True  # Prevents JavaScript access to the session cookie
 CSRF_COOKIE_HTTPONLY = True  # Prevents JavaScript from accessing CSRF cookie
 
-# For HTTPS (if using ngrok with HTTPS)
-SESSION_COOKIE_SECURE = True  # Set True for using HTTPS (e.g., ngrok generates an HTTPS URL)
+# For HTTPS (for using ngrok with HTTPS)
+SESSION_COOKIE_SECURE = True  # Set True for HTTPS
 
 # SameSite handling for cross-origin requests
 SESSION_COOKIE_SAMESITE = 'None'  # 'None' allows cross-origin requests; 'Lax' or 'Strict' for stricter policies
 CSRF_COOKIE_SAMESITE = 'None'  # Same for CSRF cookie handling
 
-AUTO_LOGOUT = {
-    'IDLE_TIME': 10,  # Logout after 1 hour of inactivity
-    'SESSION_TIME': 10, # Logout after 24 hours from login (optional)
-    'REDIRECT_TO_LOGIN_IMMEDIATELY': True, # Redirect to login page immediately after timeout
-    'MESSAGE': 'Your session has expired due to inactivity. Please log in again.',
-}
+# Session timeout: expire session after 30 minutes of inactivity
+SESSION_COOKIE_AGE = 30 * 60
+
+SESSION_SAVE_EVERY_REQUEST = True
 
 TEMPLATES = [
     {
