@@ -74,7 +74,9 @@ class TaskSerializer(serializers.ModelSerializer):
     type = serializers.ChoiceField(choices=Tasks.TASK_GROUP_CHOICES)
 
     priority = serializers.ChoiceField(choices=Tasks.PRIORITY_CHOICES, required=True)
-    status = serializers.ChoiceField(choices=Tasks.STATUS_CHOICES, read_only=True)
+    # uncomment for task progress workflows
+    # status = serializers.ChoiceField(choices=Tasks.STATUS_CHOICES, read_only=True)
+    status = serializers.ChoiceField(choices=Tasks.STATUS_CHOICES)
     due_date = serializers.DateField(required=False)
 
     class Meta:
