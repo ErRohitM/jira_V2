@@ -28,9 +28,9 @@ def track_task_changes(sender, instance, **kwargs):
     """Track changes to task for notifications"""
     if instance.pk:
         try:
-            old_instance = Tasks.objects.get(pk=instance.pk)
-            instance._old_assigned_to = old_instance.assignees
-            instance._old_status = old_instance.status
+            old_instance = Tasks.objects.filter(pk=instance.pk)
+            instance._old_assigned_to = old_instance.prefetch_related('assignees').values('assignees__email')
+            instance._old_status = old_instance.values('status')
         except Tasks.DoesNotExist:
             pass
 
@@ -56,9 +56,16 @@ def handle_task_updated(sender, instance, created, **kwargs):
                 notification_type='task_completed',
                 sender=getattr(instance, '_updated_by', None)
             )
-        elif old_status != instance.status:  # General update
+        elif old_status != instance.status:  # Status update, changes on task work flow
             notification_service.create_task_notification(
                 task=instance,
-                notification_type='task_updated',
+                notification_type='task_status_updated',
                 sender=getattr(instance, '_updated_by', None)
             )
+        # else:                                               # General update, changes on task work flow
+        #     notification_service.create_task_notification(
+        #         task=instance,
+        #         notification_type='task_updated',
+        #         sender=getattr(instance, '_updated_by', None)
+        #     )
+
