@@ -8,6 +8,7 @@ from rest_framework.pagination import LimitOffsetPagination
 
 from users.authentication import CsrfExemptSessionAuthentication
 from users.models import BaseUser
+from users.permissions import MemberPrivileges, OwnerPrivileges, ManagerPrivileges
 from .filters import TaskFilters
 
 from . models import Organization, Projects, Tasks
@@ -18,13 +19,13 @@ class CreateOrganizations(CreateAPIView):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
     authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication, SessionAuthentication)
-    permission_classes = [permissions.IsAuthenticated] # object level custom permission can be used
+    permission_classes = [permissions.IsAuthenticated] # object level custom permission can be used for restricting PUT and POST requests
 
 class ListCreateProjects(ListCreateAPIView):
     queryset = Projects.objects.all()
     serializer_class = ProjectSerilizer
     authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication, SessionAuthentication)
-    permission_classes = [permissions.IsAuthenticated]  # object level custom permission can be used
+    permission_classes = [ManagerPrivileges, OwnerPrivileges]  # object level custom permission
 
     def get_query_set_from_user_session(self):
         """
@@ -44,7 +45,6 @@ class ListCreateProjects(ListCreateAPIView):
                 pass  # Session does not exist
         return None  # Return None if no user is found
 
-
     def get(self, request, *args, **kwargs):
         user_credentials = self.get_query_set_from_user_session()
         serializer = self.serializer_class(user_credentials, many=True)
@@ -54,7 +54,7 @@ class RetrieveUpdateDeleteProjects(ListCreateAPIView):
     queryset = Projects.objects.all()
     serializer_class = ProjectSerilizer
     authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication, SessionAuthentication)
-    permission_classes = [permissions.IsAuthenticated]  # object level custom permission can be used
+    permission_classes = [ManagerPrivileges, OwnerPrivileges]  # object level custom permission
 
     def get_query_set_from_user_session(self):
         """
@@ -84,7 +84,7 @@ class ListCreateTasks(ListCreateAPIView):
     queryset = Tasks.objects.all()
     serializer_class = TaskSerializer
     authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication, SessionAuthentication)
-    permission_classes = [permissions.IsAuthenticated]  # object level custom permission can be used
+    permission_classes = [MemberPrivileges, ManagerPrivileges, OwnerPrivileges]  # object level custom permission
     filter_backends = [DjangoFilterBackend]
     filterset_class = TaskFilters
     pagination_class = LimitOffsetPagination
@@ -111,7 +111,7 @@ class RetriveUpdateDeleteTasks(RetrieveUpdateDestroyAPIView):
     queryset = Tasks.objects.all()
     serializer_class = TaskSerializer
     authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication, SessionAuthentication)
-    permission_classes = [permissions.IsAuthenticated]  # object level custom permission can be used
+    permission_classes = [MemberPrivileges, ManagerPrivileges, OwnerPrivileges]  # object level custom permission
     filter_backends = [DjangoFilterBackend]
     filterset_class = TaskFilters
     pagination_class = LimitOffsetPagination
@@ -135,8 +135,8 @@ class RetriveUpdateDeleteTasks(RetrieveUpdateDestroyAPIView):
         return None  # Return None if no user is found
 
 
-    def get(self, request, *args, **kwargs):
-        user_credentials = self.get_query_set_from_user_session()
-        serializer = self.serializer_class(user_credentials, many=True)
-        return JsonResponse(serializer.data, safe=False, status=200)
-
+    # def get(self, request, *args, **kwargs):
+    #     user_credentials = self.get_query_set_from_user_session()
+    #     serializer = self.serializer_class(user_credentials, many=True)
+    #     return JsonResponse(serializer.data, safe=False, status=200)
+    #
