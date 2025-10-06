@@ -13,16 +13,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tw-elements/dist/css/index.min.css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
-
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/htmx.org/extensions/ws.js"></script>
     {% block head %}
 
     {% endblock %}
 </head>
 
-<body hx-ext="ws" ws-connect="ws/notifications/org/1/">
+<body hx-ext="ws" ws-connect="/ws/notifications/org/1/">
 
     {% include 'navbar.html' %}
-
     <div class="container mt-4">
         {% block content %}
         {% endblock %}
@@ -35,7 +35,6 @@
 
         document.body.addEventListener('htmx:wsAfterMessage', (e) => {
             let numberOfNotifications = numberSpan.innerHTML;
-            console.log(numberOfNotifications)
             if (!numberOfNotifications) {
                 numberSpan.innerHTML = 1;
             } else {

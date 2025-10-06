@@ -2,6 +2,7 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import User
+from django.template.loader import get_template, render_to_string
 
 from core.models import Organization, Projects
 from .models import WebSocketConnection, NotificationPreference
@@ -82,10 +83,11 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         # Check if user should receive this notification
         should_receive = await self.should_receive_notification(notification_data)
         if should_receive:
-            await self.send(text_data=json.dumps({
-                'type': 'notification',
-                'data': notification_data
-            }))
+
+            html = get_template("partials/notification.html").render(
+                context={"data": notification_data}
+            )
+            await self.send(text_data=html)
 
     async def issue_update(self, event):
         """Handle issue update messages"""
