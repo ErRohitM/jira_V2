@@ -109,7 +109,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     def check_project_access(self):
         try:
             project = Projects.objects.get(id=self.project_id)
-            return project.organization__user.filter(id=self.user.id).exists()
+            return  project.organization.users.filter(id=self.user.id).exists()
         except Projects.DoesNotExist:
             return False
 

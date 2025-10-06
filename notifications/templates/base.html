@@ -20,7 +20,31 @@
     {% endblock %}
 </head>
 
-<body hx-ext="ws" ws-connect="/ws/notifications/org/1/">
+<body id="ws-container"
+       hx-ext="ws"
+       ws-connect="/ws/notifications/org/{{ organizations.0.0 }}/project/{{ projects.0.0 }}/">
+
+<div class="user-selection-container mt-4">
+      <label for="tenancy-org-select">Choose an Organization:</label>
+      <select id="tenancy-org-select" name="selectedOrganization">
+          {% for id, slug in organizations %}
+              <option value="{{ id }}">
+                  {{ slug|truncatechars:5 }}
+              </option>
+          {% endfor %}
+      </select>
+  </div>
+
+  <div class="user-selection-container mt-4">
+      <label for="tenancy-project-select">Choose a Project:</label>
+      <select id="tenancy-project-select" name="selectedProject">
+          {% for id, name in projects %}
+              <option value="{{ id }}">
+                  {{ name }}
+              </option>
+          {% endfor %}
+      </select>
+  </div>
 
     {% include 'navbar.html' %}
     <div class="container mt-4">
@@ -31,6 +55,27 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/tw-elements/dist/js/index.min.js"></script>
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const orgSelect = document.getElementById("tenancy-org-select");
+            const projectSelect = document.getElementById("tenancy-project-select");
+            const wsContainer = document.getElementById("ws-container");
+
+            function updateWebSocketRoom() {
+                const newWsPath = `/ws/notifications/org/${orgSelect.value}/project/${projectSelect.value}/`;
+                console.log('Switching to new ws path:', newWsPath);
+
+                // Update the ws-connect attribute
+                wsContainer.setAttribute("ws-connect", newWsPath);
+
+                // htmx doesn't automatically re-init on attribute change, so you manually trigger it
+                htmx.process(wsContainer);
+            }
+
+            orgSelect.addEventListener("change", updateWebSocketRoom);
+            projectSelect.addEventListener("change", updateWebSocketRoom);
+        });
+
+
         let numberSpan = document.getElementById('notification-number');
 
         document.body.addEventListener('htmx:wsAfterMessage', (e) => {
@@ -38,7 +83,7 @@
             if (!numberOfNotifications) {
                 numberSpan.innerHTML = 1;
             } else {
-                numberSpan.innerHTML = parseInt(numberOfNotifications) + 1;                
+                numberSpan.innerHTML = parseInt(numberOfNotifications) + 1;
             }
         });
 
