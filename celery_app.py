@@ -19,14 +19,14 @@ from celery.schedules import crontab
 app.conf.beat_schedule = {
     'send-overdue-reminders': {
         'task': 'notifications.tasks.send_overdue_reminders',
-        'schedule': crontab(hour=9, minute=0),  # Daily at 9 AM
+        'schedule': crontab(hour=21, minute=4),
     },
-    'cleanup-old-notifications': {
-        'task': 'notifications.tasks.cleanup_old_notifications',
-        'schedule': crontab(hour=2, minute=0),  # Daily at 2 AM
-    },
-    'cleanup-inactive-connections': {
-        'task': 'notifications.tasks.cleanup_inactive_websocket_connections',
-        'schedule': crontab(minute='*/30'),  # Every 30 minutes
-    },
+    # 'cleanup-old-notifications': {
+    #     'task': 'notifications.tasks.cleanup_old_notifications',
+    #     'schedule': crontab(hour=2, minute=0),  # Daily at 2 AM
+    # },
+    # 'cleanup-inactive-connections': {
+    #     'task': 'notifications.tasks.cleanup_inactive_websocket_connections',
+    #     'schedule': crontab(minute='*/30'),  # Every 30 minutes
+    # },
 }

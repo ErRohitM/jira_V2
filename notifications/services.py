@@ -23,7 +23,7 @@ class NotificationService:
 
             # Check user preferences
             try:
-                prefs = NotificationPreference.objects.get(user=member)
+                prefs = NotificationPreference.objects.filter(user=member)
                 if not prefs.task_updates:
                     continue
             except NotificationPreference.DoesNotExist:
@@ -48,19 +48,21 @@ class NotificationService:
 
     def send_overdue_reminder(self, task):
         """Send overdue reminder for an task"""
-        if not task.assigned_to:
+        if not task.assignees:
             return None
 
         # Check user preferences
         try:
-            prefs = NotificationPreference.objects.get(user=task.assigned_to)
-            if not prefs.overdue_reminders:
+            prefs = NotificationPreference.objects.filter(user=task.assignees.first())
+            if not prefs or not prefs.overdue_reminders:
                 return None
         except NotificationPreference.DoesNotExist:
             pass
+        except AttributeError:
+            pass
 
         notification = Notification.objects.create(
-            recipient=task.assigned_to,
+            recipient=task.assignees.first(),
             organization=task.project.organization,
             project=task.project,
             task=task,
