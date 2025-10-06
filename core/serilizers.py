@@ -79,9 +79,11 @@ class TaskSerializer(serializers.ModelSerializer):
     status = serializers.ChoiceField(choices=Tasks.STATUS_CHOICES)
     due_date = serializers.DateField(required=False)
 
+    assignees = UserListingSerializer(many=True, required=False)
+
     class Meta:
         model = Tasks
-        fields = ['id', 'title', 'type', 'project', 'project_details', 'priority', 'status', 'due_date', 'attachments']
+        fields = ['id', 'title', 'type', 'project', 'project_details', 'priority', 'status', 'due_date', 'assignees', 'attachments']
 
     def validate_project(self, value):
         if not value:
