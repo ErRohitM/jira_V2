@@ -1,25 +1,30 @@
 from celery import shared_task
+from django.db.models import Q
 from django.utils import timezone
 from datetime import timedelta
 from core.models import Tasks
 from .services import notification_service
+from celery.utils.log import get_task_logger
+
+logger = get_task_logger(__name__)
 
 @shared_task
 def send_overdue_reminders():
+    print('sent-----------------')
     """Send reminders for overdue issues"""
     now = timezone.now()
 
     # Find overdue issues that haven't been completed
     overdue_issues = Tasks.objects.filter(
-        due_date__lt=now,
-        status__in=['open', 'in_progress'],
-        assigned_to__isnull=False
-    ).select_related('assigned_to', 'project', 'project__organization')
+        Q(due_date__lt=now) &
+        Q(status__in=['TODO', 'IN_PROGRESS']) &
+        Q(assignees__isnull=False)
+    ).prefetch_related('assignees', 'project__organization')
 
     sent_count = 0
     for issue in overdue_issues:
         # Check if reminder was sent recently (within 24 hours)
-        recent_reminder = issue.notifications.filter(
+        recent_reminder = issue.notification_set.filter(
             notification_type='issue_overdue',
             created_at__gte=now - timedelta(hours=24)
         ).exists()
