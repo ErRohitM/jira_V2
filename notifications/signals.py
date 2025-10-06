@@ -41,7 +41,7 @@ def handle_task_updated(sender, instance, created, **kwargs):
     if not created:
         # Check if assigned user changed
         old_assigned_to = getattr(instance, '_old_assigned_to', None)
-        if old_assigned_to != instance.assignees.email:
+        if old_assigned_to != instance.assignees:
             notification_service.create_task_notification(
                 task=instance,
                 notification_type='task_assigned',
