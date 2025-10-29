@@ -24,7 +24,7 @@ class NotificationService:
             # Check user preferences
             try:
                 prefs = NotificationPreference.objects.filter(user=member)
-                if not prefs.task_updates:
+                if not prefs.bulk_update:
                     continue
             except NotificationPreference.DoesNotExist:
                 pass  # Default to sending notifications

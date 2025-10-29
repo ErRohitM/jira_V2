@@ -128,11 +128,14 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@yourproject.c
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'jira_multi_tenancy',
+        'USER': 'postgres',
+        'PASSWORD': 'rohit123',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
-
 
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.Argon2PasswordHasher",
